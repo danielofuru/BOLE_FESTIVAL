@@ -14,8 +14,7 @@ pipeline {
         }
         stage('Build') {
             steps {
-                sh 'npm install'
-                sh 'npm run build'
+                sh 'docker build -t danielofuru/danny-bole:latest .'
             }
         }
         stage('Build Docker Image') {
@@ -27,10 +26,7 @@ pipeline {
         }
         stage('Push Docker Image') {
             steps {
-                script {
-                    docker.withRegistry('', "${DOCKER_HUB_CREDENTIALS}") {
-                        docker.image("${DOCKER_HUB_REPO}:${env.BUILD_NUMBER}").push()
-                    }
+                sh 'docker push danielofuru/danny-bole:latest'
                 }
             }
         }
