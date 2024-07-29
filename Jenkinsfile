@@ -9,7 +9,7 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                git 'https://github.com/danielofuru/BOLE-FESTIVAL.git'
+                git 'https://github.com/danielofuru/BOLE_FESTIVAL.git'
             }
         }
         stage('Install Dependencies') {
