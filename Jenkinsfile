@@ -4,6 +4,7 @@ pipeline {
     environment {
         DOCKER_HUB_REPO = 'danielofuru/danny-bole'
         DOCKER_HUB_CREDENTIALS = 'dockerHubCredentials'
+        NODE_VERSION = '14.17.6'
     }
 
     stages {
@@ -12,20 +13,34 @@ pipeline {
                 git 'https://github.com/danielofuru/BOLE_FESTIVAL.git'
             }
         }
-        stage('Install Node.js') {
+        stage('Install nvm and Node.js') {
             steps {
-                sh 'curl -sL https://deb.nodesource.com/setup_14.x | sudo -E bash -'
-                sh 'sudo apt-get install -y nodejs'
+                sh '''
+                curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash
+                . ~/.nvm/nvm.sh
+                nvm install ${NODE_VERSION}
+                nvm use ${NODE_VERSION}
+                node -v
+                npm -v
+                '''
             }
         }
         stage('Install Dependencies') {
             steps {
-                sh 'npm install'
+                sh '''
+                . ~/.nvm/nvm.sh
+                nvm use ${NODE_VERSION}
+                npm install
+                '''
             }
         }
         stage('Build') {
             steps {
-                sh 'npm run build'
+                sh '''
+                . ~/.nvm/nvm.sh
+                nvm use ${NODE_VERSION}
+                npm run build
+                '''
             }
         }
         stage('Build Docker Image') {
@@ -52,3 +67,4 @@ pipeline {
         }
     }
 }
+
