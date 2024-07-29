@@ -9,12 +9,17 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                checkout scm
+                git 'https://github.com/danielofuru/BOLE-FESTIVAL.git'
+            }
+        }
+        stage('Install Dependencies') {
+            steps {
+                sh 'npm install'
             }
         }
         stage('Build') {
             steps {
-                sh 'docker build -t danielofuru/danny-bole:latest .'
+                sh 'npm run build'
             }
         }
         stage('Build Docker Image') {
@@ -26,16 +31,18 @@ pipeline {
         }
         stage('Push Docker Image') {
             steps {
-                sh 'docker push danielofuru/danny-bole:latest'
+                script {
+                    docker.withRegistry('', "${DOCKER_HUB_CREDENTIALS}") {
+                        docker.image("${env.DOCKER_HUB_REPO}:${env.BUILD_NUMBER}").push()
+                    }
                 }
             }
         }
     }
-    
+
     post {
         always {
             cleanWs()
         }
     }
 }
-
