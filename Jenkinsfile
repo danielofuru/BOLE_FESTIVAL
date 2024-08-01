@@ -9,14 +9,7 @@ pipeline {
     stages {
         stage('Clone Repository') {
             steps {
-                script {
-                    // Print Git version and debug info
-                    sh 'git --version'
-                    sh 'git config --list'
-                    
-                    // Clone the repository manually for debugging
-                    sh 'git clone https://github.com/danielofuru/BOLE_FESTIVAL.git'
-                }
+                git branch: 'main', url: 'https://github.com/danielofuru/BOLE_FESTIVAL.git'
             }
         }
 
