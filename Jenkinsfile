@@ -9,7 +9,7 @@ pipeline {
     stages {
         stage('Clone Repository') {
             steps {
-                git branch: 'main', url: 'https://github.com/danielofuru/nginx.git'
+                git branch: 'danny-dev', url: 'https://github.com/danielofuru/BOLE_FESTIVAL.git'
             }
         }
 
