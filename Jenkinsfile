@@ -2,59 +2,30 @@ pipeline {
     agent any
 
     environment {
-        DOCKER_HUB_REPO = 'danielofuru/danny-bole'
-        DOCKER_HUB_CREDENTIALS = 'dockerHubCredentials'
-        NODE_VERSION = '14.17.6'
+        DOCKERHUB_CREDENTIALS = credentials('DockerHubCredentials')
+        DOCKER_IMAGE = 'danielofuru/nginx'
     }
 
     stages {
-        stage('Checkout') {
+        stage('Clone Repository') {
             steps {
-                git 'https://github.com/danielofuru/BOLE_FESTIVAL.git'
+                git branch: 'main', url: 'https://github.com/danielofuru/nginx.git'
             }
         }
-        stage('Install nvm and Node.js') {
-            steps {
-                sh '''
-                curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash
-                . ~/.nvm/nvm.sh
-                nvm install ${NODE_VERSION}
-                nvm use ${NODE_VERSION}
-                node -v
-                npm -v
-                '''
-            }
-        }
-        stage('Install Dependencies') {
-            steps {
-                sh '''
-                . ~/.nvm/nvm.sh
-                nvm use ${NODE_VERSION}
-                npm install
-                '''
-            }
-        }
-        stage('Build') {
-            steps {
-                sh '''
-                . ~/.nvm/nvm.sh
-                nvm use ${NODE_VERSION}
-                npm run build
-                '''
-            }
-        }
+
         stage('Build Docker Image') {
             steps {
                 script {
-                    docker.build("${env.DOCKER_HUB_REPO}:${env.BUILD_NUMBER}")
+                    docker.build(DOCKER_IMAGE)
                 }
             }
         }
-        stage('Push Docker Image') {
+
+        stage('Push to Docker Hub') {
             steps {
                 script {
-                    docker.withRegistry('', "${DOCKER_HUB_CREDENTIALS}") {
-                        docker.image("${env.DOCKER_HUB_REPO}:${env.BUILD_NUMBER}").push()
+                    docker.withRegistry('', DOCKERHUB_CREDENTIALS) {
+                        docker.image(DOCKER_IMAGE).push('latest')
                     }
                 }
             }
@@ -62,9 +33,11 @@ pipeline {
     }
 
     post {
-        always {
-            cleanWs()
+        success {
+            echo 'Pipeline executed successfully.'
+        }
+        failure {
+            echo 'Pipeline failed.'
         }
     }
 }
-
