@@ -2,14 +2,21 @@ pipeline {
     agent any
 
     environment {
-        DOCKERHUB_CREDENTIALS = credentials('DockerHubCredentials')
+        DOCKERHUB_CREDENTIALS = credentials('dockerHubCredentials')
         DOCKER_IMAGE = 'danielofuru/nginx'
     }
 
     stages {
         stage('Clone Repository') {
             steps {
-                git branch: 'danny-dev', url: 'https://github.com/danielofuru/BOLE_FESTIVAL.git'
+                script {
+                    // Print Git version and debug info
+                    sh 'git --version'
+                    sh 'git config --list'
+                    
+                    // Clone the repository manually for debugging
+                    sh 'git clone https://github.com/danielofuru/BOLE_FESTIVAL.git'
+                }
             }
         }
 
